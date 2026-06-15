@@ -4,15 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TODO — Список задач</title>
-  <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* === CSS СТИЛИ === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0f0f; --surface: #181818; --surface2: #222222; --border: #2e2e2e;
+      --accent: #d4af6e; --accent2: #e8c882; --text: #f0ece4; --muted: #6b6660;
+      --done-col: #3a3733; --red: #c0544a; --radius: 4px;
+      --ff-head: 'Playfair Display', Georgia, serif; --ff-body: 'DM Sans', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--ff-body); font-weight: 300; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 60px 20px 80px; overflow-x: hidden; }
+    .noise { pointer-events: none; position: fixed; inset: 0; z-index: 0; opacity: .03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px 180px; }
+    .app { position: relative; z-index: 1; width: 100%; max-width: 560px; }
+    .header { margin-bottom: 44px; animation: fadeDown .5s ease both; }
+    .header__label { font-size: 11px; font-weight: 500; letter-spacing: .2em; color: var(--accent); margin-bottom: 8px; }
+    .header__title { font-family: var(--ff-head); font-size: clamp(52px, 12vw, 80px); font-weight: 700; line-height: 1; color: var(--text); }
+    .header__title::after { content: '.'; color: var(--accent); }
+    .header__sub { margin-top: 10px; font-size: 14px; color: var(--muted); }
+    .input-section { margin-bottom: 24px; animation: fadeDown .5s .1s ease both; }
+    .input-wrap { display: flex; gap: 10px; }
+    .task-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--ff-body); font-size: 15px; padding: 13px 16px; outline: none; transition: border-color .2s; }
+    .task-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,110,.12); }
+    .add-btn { background: var(--accent); border: none; border-radius: var(--radius); color: var(--bg); cursor: pointer; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s; }
+    .add-btn:hover { background: var(--accent2); transform: scale(1.05); }
+    .error-msg { font-size: 12px; color: var(--red); margin-top: 6px; min-height: 18px; opacity: 0; transition: opacity .2s; }
+    .error-msg.visible { opacity: 1; }
+    .filters { display: flex; gap: 4px; margin-bottom: 20px; }
+    .filter-btn { background: none; border: 1px solid var(--border); border-radius: 20px; color: var(--muted); cursor: pointer; padding: 6px 16px; transition: all .2s; }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 500; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .task-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; gap: 12px; padding: 14px 16px; transition: opacity .25s, transform .25s; animation: slideIn .25s ease both; }
+    .task-item.done { background: var(--done-col); opacity: .65; }
+    .task-item.removing { opacity: 0; transform: translateX(16px); }
+    .task-check { appearance: none; width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%; cursor: pointer; position: relative; }
+    .task-check:checked { background: var(--accent); border-color: var(--accent); }
+    .task-check:checked::after { content: ''; position: absolute; top: 3px; left: 6px; width: 5px; height: 9px; border: 2px solid var(--bg); border-top: none; border-left: none; transform: rotate(45deg); }
+    .task-title { flex: 1; font-size: 15px; }
+    .task-item.done .task-title { text-decoration: line-through; color: var(--muted); }
+    .delete-btn { background: none; border: none; color: var(--muted); cursor: pointer; opacity: 0; }
+    .task-item:hover .delete-btn { opacity: 1; }
+    .hidden { display: none !important; }
+    .footer { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .clear-btn { background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; padding: 6px 12px; }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
 <body>
 
   <div class="noise"></div>
 
   <main class="app">
-
     <header class="header">
       <div class="header__label">ЗАДАЧИ</div>
       <h1 class="header__title">TODO</h1>
@@ -21,19 +65,9 @@
 
     <section class="input-section">
       <div class="input-wrap">
-        <input
-          id="taskInput"
-          class="task-input"
-          type="text"
-          placeholder="Добавить новую задачу..."
-          autocomplete="off"
-          maxlength="200"
-        />
+        <input id="taskInput" class="task-input" type="text" placeholder="Добавить новую задачу..." autocomplete="off" maxlength="200" />
         <button id="addBtn" class="add-btn" aria-label="Добавить задачу">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <line x1="10" y1="2" x2="10" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="10" y1="2" x2="10" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div id="errorMsg" class="error-msg" aria-live="polite"></div>
@@ -47,18 +81,78 @@
 
     <div class="tasks-container">
       <ul id="taskList" class="task-list"></ul>
-      <div id="emptyState" class="empty-state hidden">
-        <p>Задач нет. Самое время добавить!</p>
-      </div>
+      <div id="emptyState" class="empty-state hidden"><p>Задач нет. Самое время добавить!</p></div>
     </div>
 
     <footer class="footer">
       <span id="countLabel" class="count-label"></span>
       <button id="clearDoneBtn" class="clear-btn hidden">Удалить завершённые</button>
     </footer>
-
   </main>
 
-  <script src="js/script.js"></script>
+  <script>
+    /* === JAVASCRIPT === */
+    "use strict";
+    const STORAGE_KEY = "todo-tasks";
+    const taskInput = document.getElementById("taskInput"), addBtn = document.getElementById("addBtn"), taskList = document.getElementById("taskList"), emptyState = document.getElementById("emptyState"), countLabel = document.getElementById("countLabel"), clearDoneBtn = document.getElementById("clearDoneBtn"), errorMsg = document.getElementById("errorMsg"), filterBtns = document.querySelectorAll(".filter-btn");
+    let currentFilter = "all";
+
+    function getTasks() { try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch { return []; } }
+    function setTasks(tasks) { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+
+    function renderTask(task) {
+      const li = document.createElement("li");
+      li.className = `task-item${task.done ? " done" : ""}`;
+      li.innerHTML = `<input type="checkbox" class="task-check" id="check-${task.id}" ${task.done ? "checked" : ""} /><label class="task-title" for="check-${task.id}">${escapeHtml(task.title)}</label><button class="delete-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
+      li.querySelector(".task-check").addEventListener("change", () => toggleTask(task.id, li));
+      li.querySelector(".delete-btn").addEventListener("click", () => deleteTask(task.id, li));
+      return li;
+    }
+
+    function renderList() {
+      const all = getTasks();
+      let tasks = all;
+      if (currentFilter === "active") tasks = all.filter(t => !t.done);
+      if (currentFilter === "done") tasks = all.filter(t => t.done);
+      taskList.innerHTML = "";
+      if (tasks.length === 0) emptyState.classList.remove("hidden");
+      else { emptyState.classList.add("hidden"); tasks.forEach(t => taskList.appendChild(renderTask(t))); }
+      updateFooter(all);
+    }
+
+    function updateFooter(all) {
+      const active = all.filter(t => !t.done).length, done = all.filter(t => t.done).length;
+      countLabel.textContent = currentFilter === "all" ? `${active} активн... · ${done} завершён...` : (currentFilter === "active" ? `${active} активн...` : `${done} завершён...`);
+      clearDoneBtn.classList.toggle("hidden", done === 0);
+    }
+
+    function addTask() {
+      const title = taskInput.value.trim();
+      if (!title) { errorMsg.textContent = "Введите задачу"; errorMsg.classList.add("visible"); return; }
+      errorMsg.classList.remove("visible");
+      const tasks = getTasks();
+      tasks.push({ id: Date.now(), title, done: false });
+      setTasks(tasks); taskInput.value = ""; renderList();
+    }
+
+    function toggleTask(id, li) {
+      const tasks = getTasks();
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task.done = !task.done;
+      setTasks(tasks);
+      if (currentFilter !== "all") { li.classList.add("removing"); setTimeout(renderList, 250); }
+      else renderList();
+    }
+
+    function deleteTask(id, li) { li.classList.add("removing"); setTimeout(() => { setTasks(getTasks().filter(t => t.id !== id)); renderList(); }, 250); }
+    function escapeHtml(str) { return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+    addBtn.addEventListener("click", addTask);
+    taskInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addTask(); });
+    filterBtns.forEach(btn => btn.addEventListener("click", () => { filterBtns.forEach(b => b.classList.remove("active")); btn.classList.add("active"); currentFilter = btn.dataset.filter; renderList(); }));
+    clearDoneBtn.addEventListener("click", () => { setTasks(getTasks().filter(t => !t.done)); renderList(); });
+    renderList();
+  </script>
 </body>
 </html>
