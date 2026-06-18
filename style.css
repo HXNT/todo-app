@@ -185,7 +185,7 @@ body {
 
 .hidden { display: none !important; }
 
-/* === ПОДВАЛ === */
+/* === Footer === */
 .footer {
   margin-top: 20px;
   display: flex;
@@ -207,7 +207,7 @@ body {
 
 .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
-/* === АДАПТИВНОСТЬ (Дополнительное задание) === */
+/* === АДАПТИВНОСТЬ === */
 @media (max-width: 480px) {
   body { padding: 30px 16px; }
   .header__title { font-size: 36px; }

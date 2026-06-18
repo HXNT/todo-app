@@ -137,7 +137,7 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// === Навешивание событий ===
+// === Добавление событий ===
 addBtn.addEventListener("click", addTask);
 taskInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") addTask();
