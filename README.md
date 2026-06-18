@@ -56,5 +56,5 @@ https://hxnt.github.io/todo-app/
 ## Скриншот приложения **Свой список задач**
 
 <p align="center">
-  <img src="" width="550" alt="Интерфейс приложения To-Do - Свой Список задач" />
+  <img src="https://github.com/user-attachments/assets/38f879b6-4cea-4bdd-a9d0-131cfd0e74a9" width="550" alt="Интерфейс приложения To-Do - Свой Список задач" />
 </p>
