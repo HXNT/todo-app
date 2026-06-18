@@ -41,17 +41,6 @@ body {
   letter-spacing: -.02em;
 }
 
-.header__title::after {
-  content: '.';
-  color: var(--accent);
-}
-
-.header__sub {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
 /* === ПОЛЕ ВВОДА === */
 .input-wrap {
   display: flex;
@@ -148,9 +137,46 @@ body {
 }
 
 .task-check {
-  width: 18px;
-  height: 18px;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 50%; 
+  background: transparent;
   cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0; 
+}
+
+.task-check:hover {
+  border-color: var(--accent);
+}
+
+.task-check:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.task-check::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--bg); 
+  border-bottom: 2px solid var(--bg);
+  transform: rotate(-45deg); 
+  margin-top: -2px; 
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.task-check:checked::after {
+  opacity: 1;
 }
 
 .task-title {
