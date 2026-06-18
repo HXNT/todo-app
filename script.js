@@ -95,9 +95,25 @@ function addTask() {
   errorMsg.textContent = "";
 
   const tasks = getTasks();
+
+  let finalizedTitle = title;
+  let count = 0;
+
+  tasks.forEach(task => {
+        const cleanTitle = task.title.replace(/ \(\d+\)$/, '');
+        
+        if (cleanTitle.toLowerCase() === title.toLowerCase()) {
+            count++;
+        }
+    });
+
+    if (count > 0) {
+        finalizedTitle = `${title} (${count + 1})`;
+    }
+
   tasks.push({
     id: Date.now(),
-    title: title,
+    title: finalizedTitle,
     done: false
   });
   
